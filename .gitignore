@@ -1,0 +1,21 @@
+# .gitignore
+# Ambientes Virtuais Python
+venv/
+*.env
+env/
+
+# Arquivos do Django e Python
+__pycache__/
+*.pyc
+*.log
+*~
+
+# Arquivo do banco de dados SQLite
+db.sqlite3
+
+# Arquivos de IDE (VS Code)
+.vscode/
+
+# Pasta de Mídia e Estáticos (se existirem)
+media/
+static_root/

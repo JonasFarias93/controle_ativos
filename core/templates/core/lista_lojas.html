@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <style>
+        /* Estilos básicos para o CSS */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>📋 {{ titulo }}</h1>
+    <p>Total de Lojas encontradas: <strong>{{ total_registros }}</strong></p>
+    <form method="GET" action="{% url 'lista_lojas' %}" style="margin-bottom: 20px;">
+        <input type="text" name="q" placeholder="Buscar por Filial ou Nome (java/filial)" 
+               value="{{ query }}" 
+               style="padding: 10px; width: 300px; border: 1px solid #ccc;">
+        <button type="submit" style="padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer;">Buscar</button>
+        {% if query %}
+            <a href="{% url 'lista_lojas' %}" style="padding: 10px 15px; margin-left: 10px; background-color: #ccc; color: black; text-decoration: none;">Limpar Busca</a>
+        {% endif %}
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Filial</th>
+                <th>Nome</th>
+                <th>Cidade / UF</th>
+                <th>Telefone</th>
+                <th>IP Banco 12</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for loja in lojas %}
+            <tr>
+                <td>{{ loja.filial }}</td>
+                <td>{{ loja.nome_filial }}</td>
+                <td>{{ loja.cidade }}/{{ loja.uf }}</td>
+                <td>{{ loja.telefone|default:"N/A" }}</td>
+                <td>{{ loja.ip_banco_12|default:"N/A" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Nenhuma loja cadastrada no momento.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
