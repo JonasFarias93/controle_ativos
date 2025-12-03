@@ -24,6 +24,9 @@ class Loja(models.Model):
     ip_banco_12 = models.CharField(max_length=20, null=True, blank=True, verbose_name="IP Banco 12")
     hist = models.CharField(max_length=50, null=True, blank=True)
     logomarca = models.CharField(max_length=20, null=True, blank=False)
+    insc_estadual = models.CharField(max_length=50, null=True, blank=True, verbose_name="Inscrição Estadual")
+    cnpj = models.CharField(max_length=50, null=True, blank=True, verbose_name="CNPJ")
+    regiao = models.CharField(max_length=50, null=True, blank=True, verbose_name="Região")
 
     # STATUS E REPRESENTAÇÃO
     STATUS_CHOICES = [

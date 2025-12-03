@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from .models import Loja
+from django.db.models import Q
+
 
 
 def lista_lojas(request):
@@ -13,7 +15,9 @@ def lista_lojas(request):
         except ValueError:
             lojas = lojas.filter(
                 Q(nome_filial__icontains=query) |
-                Q(endereco__icontains=query)
+                Q(endereco__icontains=query) |
+                Q(cidade__icontains=query) |
+                Q(cnpj__icontains=query)
             )
 
     context = {
