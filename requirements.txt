@@ -1,3 +1,9 @@
 asgiref @ file:///work/buildout/croot/asgiref_1761946762083/work
 Django @ file:///home/task_176432919713519/conda-bld/django_1764329208954/work
+numpy==2.3.5
+pandas==2.3.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
+six==1.17.0
 sqlparse @ file:///home/task_176424002765119/conda-bld/sqlparse_1764240040748/work
+tzdata==2025.2
