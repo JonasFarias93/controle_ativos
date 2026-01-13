@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'controle_ativos',
+    'projetos',
 ]
 
 MIDDLEWARE = [

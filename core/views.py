@@ -2,7 +2,9 @@ from django.shortcuts import render
 from .models import Loja
 from django.db.models import Q
 
-
+def home(request):
+    # Esta é a função que o seu core/urls.py está procurando
+    return render(request, 'core/home.html')
 
 def lista_lojas(request):
     query = request.GET.get('q')
