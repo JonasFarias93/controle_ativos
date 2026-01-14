@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Projetos e Kits Cadastrados</h2>
+</div>
+
+<div class="row mb-5">
+    {% for projeto in projetos %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-dark text-white text-center">
+                <h5 class="mb-0">{{ projeto.nome }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted border-bottom pb-1">Kits neste projeto:</p>
+                {% if projeto.kits.all %}
+                    {% for kit_item in projeto.kits.all %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <span class="fw-bold">{{ kit_item.nome }}</span>
+                        <a href="{% url 'projetos:editar_kit' kit_item.id %}" class="btn btn-sm btn-outline-secondary py-0" style="font-size: 0.7rem;">Editar</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted py-3" style="font-size: 0.9rem;">Nenhum kit cadastrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<hr class="border border-secondary border-2 opacity-50 my-5" id="area-cadastro">
+
+<div class="row justify-content-center mb-5">
+    <div class="col-md-10">
+        <div class="card shadow">
+            
+            <div class="card-header {% if editando %}bg-warning{% else %}bg-success{% endif %} text-white">
+                <h4 class="mb-0">
+                    {% if editando %}
+                        <i class="bi bi-pencil-square"></i> Editando Kit: {{ kit.nome }}
+                    {% else %}
+                        <i class="bi bi-plus-circle"></i> Cadastrar Novo Kit
+                    {% endif %}
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="post" id="form-container">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Nome do Kit</label>
+                            {{ form.nome }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Projeto Vinculado</label>
+                            {{ form.projeto }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0 text-secondary">Itens do Kit</h5>
+                        <button type="button" id="add-item" class="btn btn-outline-primary btn-sm">+ Adicionar Equipamento</button>
+                    </div>
+
+                    {{ formset.management_form }}
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Equipamento</th>
+                                <th>Finalidade</th>
+                                <th style="width: 110px;">Quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="item-tbody">
+                            {% for f in formset %}
+                            <tr class="item-row">
+                                <td>{{ f.id }}{{ f.equipamento }}</td> <td>{{ f.uso_no_kit }}</td>
+                                <td>{{ f.quantidade }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        {% if editando %}
+                            <a href="{% url 'projetos:cadastrar_kit' %}" class="btn btn-secondary me-2">Cancelar Edição</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                            {% if editando %}Salvar Alterações{% else %}Salvar Novo Kit{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('add-item').addEventListener('click', function() {
+        const tbody = document.getElementById('item-tbody');
+        const totalForms = document.querySelector('[id$="-TOTAL_FORMS"]'); 
+        const currentFormCount = parseInt(totalForms.value);
+        const rows = document.getElementsByClassName('item-row');
+        const newRow = rows[0].cloneNode(true);
+        const formRegex = new RegExp(`-(\\d+)-`, 'g');
+        newRow.innerHTML = newRow.innerHTML.replace(formRegex, `-${currentFormCount}-`);
+        
+        // Limpa campos na nova linha
+        newRow.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'hidden') return; // Não limpa campos ocultos de ID
+            if (input.type !== 'number') input.value = '';
+            else input.value = 1;
+        });
+        
+        tbody.appendChild(newRow);
+        totalForms.value = currentFormCount + 1;
+    });
+</script>
+{% endblock %}

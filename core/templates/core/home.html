@@ -1,12 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 class="mb-4 text-primary">Painel de Movimentações</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Painel de Movimentações</h2>
+        <a href="{% url 'registro:iniciar_registro' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nova Bipagem
+        </a>
+    </div>
     
     <div class="card shadow-sm">
         <div class="card-body">
-            <table class="table table-hover">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size: 0.85rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>JAVA</th>
+                            <th>EQUIPAMENTO</th>
+                            <th>CATEGORIA</th>
+                            <th>LOJA</th>
+                            <th>ATIVO</th>
+                            <th>Nº DE SÉRIE</th>
+                            <th>CHAMADO / NF</th>
+                            <th>DATA SEPARAÇÃO</th>
+                            <th>OBSERVAÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mov in movimentacoes %}
+                        <tr>
+                            <td>{{ mov.codigo_java|default:"-" }}</td> 
+                            
+                            <td><strong>{{ mov.equipamento_tipo }}</strong></td>
+                            
+                            <td>{{ mov.registro.projeto.nome|default:"Adição" }}</td> 
+                            
+                            <td>{{ mov.registro.loja.nome_filial }}</td>
+                            
+                            <td class="text-primary fw-bold">{{ mov.ativo_id }}</td>
+                            
+                            <td>{{ mov.num_serie }}</td>
+                            
+                            <td><span class="badge bg-info text-dark">{{ mov.registro.numero_chamado }}</span></td>
+                            
+                            <td>{{ mov.registro.data_registro|date:"d/m/Y H:i" }}</td>
+                            
+                            <td><small class="text-muted">{{ mov.registro.observacoes|default:"-" }}</small></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">Nenhuma movimentação registrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
+            </div>
         </div>
     </div>
 {% endblock %}

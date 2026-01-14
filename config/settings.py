@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'core',
     'controle_ativos',
     'projetos',
+    'registro',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Nova Bipagem de Saída</h2>
+
+    <form method="post" id="form-registro">
+        {% csrf_token %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">Dados da Movimentação</div>
+            <div class="card-body row">
+    <div class="col-md-3">
+        {{ form.projeto.label_tag }}
+        {{ form.projeto }}
+    </div>
+    <div class="col-md-3">
+        {{ form.loja.label_tag }}
+        {{ form.loja }}
+    </div>
+    <div class="col-md-3">
+        {{ form.numero_chamado.label_tag }}
+        {{ form.numero_chamado }}
+    </div>
+    <div class="col-md-3">
+        {{ form.kit_utilizado.label_tag }}
+        <select name="kit_utilizado" id="id_kit_utilizado" class="form-select" onchange="atualizarKit()">
+            <option value="">---------</option>
+            {% for k in form.fields.kit_utilizado.queryset %}
+                <option value="{{ k.id }}" {% if kit and kit.id == k.id %}selected{% endif %}>{{ k.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+        {% if kit %}
+        <div class="card border-primary shadow">
+            <div class="card-header bg-primary text-white">Bipagem de Itens: {{ kit.nome }}</div>
+            <div class="card-body">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Equipamento</th>
+                            <th style="width: 30%;">1º Ativo ID</th> <th style="width: 30%;">2º Número de Série</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in kit.itens.all %}
+                            {% with ''|center:item.quantidade as range %}
+                            {% for _ in range %}
+                            <tr>
+                                <td>
+                                    <span class="fw-bold">{{ item.equipamento }}</span>
+                                    <input type="hidden" name="tipo_equipamento[]" value="{{ item.equipamento }}">
+                                </td>
+                                <td><input type="text" name="ativo[]" class="form-control" placeholder="Bipar Ativo..." required></td>
+                                <td><input type="text" name="serie[]" class="form-control" placeholder="Bipar Serial..." required></td>
+                            </tr>
+                            {% endfor %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success btn-lg px-5">Finalizar e Registrar Saída</button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">Selecione um <b>Projeto</b> e um <b>Kit</b> para liberar a bipagem.</div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function atualizarKit() {
+    const kitId = document.getElementById('id_kit_utilizado').value;
+    const url = new URL(window.location);
+    url.searchParams.set('kit', kitId);
+    window.location.href = url.href; // Recarrega a página com o kit selecionado na URL
+}
+</script>
+{% endblock %}

@@ -1,133 +1,48 @@
 from django.db import models
-from projetos.models import Categoria
 
-# --- DEFINIÇÃO DOS CHOICES ---
+class Categoria(models.Model):
+    """ Ex: Monitor, Micro, Rede, Periféricos """
+    nome = models.CharField(max_length=100, unique=True)
 
-# 1. Choices para o Status do Processo de Movimentação (SMARTX)
-SMARTX_CHOICES = [
-    ('A_SEPARACAO', 'A. Separação'),
-    ('A_NF', 'A. NF'),
-    ('A_COLETA', 'A. Coleta'),
-    ('A_BAIXA', 'A. Baixa'),
-    ('FINALIZADO', 'Finalizado'),
-]
-
-# 2. Choices para o Status Físico/Localização do Equipamento (STATUS)
-STATUS_CHOICES = [
-    ('ESTOQUE', 'Em Estoque'),
-    ('USO', 'Em Uso'),
-    ('BAIXA', 'Baixado'),
-    ('MOVIMENTACAO', 'Em Movimentação'),
-]
-
-# ------------------------------
-
-### 1. Modelo TipoEquipamento
-class TipoEquipamento(models.Model):
-    """Armazena a descrição padronizada dos equipamentos."""
-    nome = models.CharField(
-        max_length=100, 
-        unique=True, 
-        verbose_name="Tipo de Equipamento"
-    )
-    
-    class Meta:
-        verbose_name = "Tipo de Equipamento"
-        verbose_name_plural = "Tipos de Equipamento"
-        
     def __str__(self):
         return self.nome
-        
 
-### 2. Modelo Chamado (SMARTX CORRIGIDO)
-class Chamado(models.Model):
-    """Armazena os detalhes do chamado/requisição de movimentação."""
-    numero_chamado = models.CharField(
-        max_length=50, 
-        unique=True, 
-        verbose_name="Chamado / Nº"
-    )
-    data_separacao = models.DateField(
-        null=True, 
-        blank=True, 
-        verbose_name="Data Separação"
-    )
-    data_saida = models.DateField(
-        null=True, 
-        blank=True, 
-        verbose_name="Data Saída"
-    )
+class Equipamento(models.Model):
+    """ 
+    Ficha Cadastral: Onde você define o padrão do que existe.
+    """
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50) # Ex: LCD, Touch, Laser
+    fabricante = models.CharField(max_length=100, blank=True, null=True)
     
-    # CORREÇÃO: Aplicando SMARTX_CHOICES e definindo um default
-    smartx = models.CharField(
-        max_length=50, 
-        choices=SMARTX_CHOICES,
-        default='A_AGUARDANDO',
-        verbose_name="Smartx / Status do Chamado"
-    )
+    # A regra que você pediu:
+    exige_ativo = models.BooleanField(default=True, verbose_name="Este item possui Ativo/Patrimônio?")
     
-    volume = models.IntegerField(
-        verbose_name="Volume"
-    )
-
-    categoria = models.ForeignKey(
-        Categoria, 
-        on_delete=models.PROTECT, 
-        verbose_name="Categoria do Projeto"
-    )
-    
-    class Meta:
-        verbose_name = "Chamado"
-        verbose_name_plural = "Chamados"
-        
     def __str__(self):
-        return self.numero_chamado
-        
-### 3. Modelo Ativo (STATUS MANTIDO)
-class Ativo(models.Model):
-    """Armazena o registro de cada equipamento individual (ativo)."""
+        return f"{self.nome} ({self.tipo})"
+
+class AtivoFisico(models.Model):
+    """
+    O estoque real: Onde ocorre o "Bip".
+    """
+    equipamento = models.ForeignKey(Equipamento, on_delete=models.CASCADE)
     
-    # Relacionamentos
-    chamado = models.ForeignKey(
-        Chamado, 
-        on_delete=models.SET_NULL,
-        null=True, 
-        verbose_name="Chamado Associado"
-    )
-    tipo = models.ForeignKey(
-        TipoEquipamento, 
-        on_delete=models.PROTECT,
-        verbose_name="Tipo"
-    )
-
-    # Campos do Ativo
-    codigo_equipamento = models.CharField(
-        max_length=50, 
-        verbose_name="C. Equipamento"
-    )
-    nr_serie = models.CharField(
-        max_length=100, 
-        unique=True, 
-        verbose_name="Nº de Série"
-    )
-    ativo_id = models.CharField(
-        max_length=50, 
-        verbose_name="ID Ativo",
-        blank=True,
-        null=True
-    )
-
-    # STATUS MANTIDO
+    # Identificadores Únicos
+    patrimonio_ativo = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    num_serie = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    
+    # Controle de quantidade para itens sem ativo (ex: Hub USB)
+    quantidade = models.PositiveIntegerField(default=1) 
+    
+    data_cadastro = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='ESTOQUE',
-        verbose_name="Status Atual"
+        max_length=50, 
+        choices=[('estoque', 'Em Estoque'), ('enviado', 'Enviado'), ('defeito', 'Defeito')],
+        default='estoque'
     )
 
-    class Meta:
-        verbose_name = "Ativo"
-        verbose_name_plural = "Ativos"
-
     def __str__(self):
-        return f'{self.tipo.nome} ({self.nr_serie})'
+        if self.equipamento.exige_ativo:
+            return f"Ativo: {self.patrimonio_ativo} - {self.equipamento.nome}"
+        return f"{self.equipamento.nome} (Qtd: {self.quantidade})"

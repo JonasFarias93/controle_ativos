@@ -46,34 +46,3 @@ class Loja(models.Model):
     class Meta:
         verbose_name = "Loja"
         verbose_name_plural = "Lojas"
-
-# =================================================================
-# 2. MODELO PROJETO
-# =================================================================
-
-class Projeto(models.Model):
-    nome = models.CharField(max_length=50, unique=True)
-    descricao = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return self.nome
-    
-    class Meta:
-        verbose_name = "Projeto"
-        verbose_name_plural = "Projetos"
-
-# =================================================================
-# 3. MODELO ITEMBASE 
-# =================================================================
-
-class ItemBase(models.Model):
-    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome do Equipamento/Kit")
-    descricao = models.TextField(null=True, blank=True)
-    tipo = models.CharField(max_length=50, default='PDV', help_text="Ex: PDV, Redes, Periférico, Servidor")
-
-    def __str__(self):
-        return self.nome
-    
-    class Meta:
-        verbose_name = "Item Base"
-        verbose_name_plural = "Itens Base"
