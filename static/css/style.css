@@ -1,0 +1,24 @@
+/* Estilos globais do Sistema de Ativos */
+* {
+  font-family: 'Inter', sans-serif;
+}
+/* Ajuste para mensagens de alerta não ficarem coladas no topo */
+.alert {
+    margin-top: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Estilo para destacar campos com erro (usado pelo Django Forms) */
+.errorlist {
+    color: #dc3545;
+    list-style: none;
+    padding: 0;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Feedback visual para linhas da tabela ao passar o mouse */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transition: 0.3s;
+}
