@@ -11,18 +11,26 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <form method="GET" action="{% url 'lista_lojas' %}" class="row g-2">
-            <div class="col-md-8">
-                <input type="text" name="q" class="form-control form-control-lg" 
-                       placeholder="Buscar por Filial, Nome, Endereço ou CNPJ..." 
-                       value="{{ query }}">
-            </div>
-            <div class="col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-lg flex-grow-1">Buscar</button>
-                {% if query %}
-                    <a href="{% url 'lista_lojas' %}" class="btn btn-outline-secondary btn-lg">Limpar</a>
-                {% endif %}
-            </div>
-        </form>
+    <div class="col-md-3">
+        <select name="tipo" class="form-select form-select-lg">
+            <option value="filial" {% if tipo == 'filial' %}selected{% endif %}>Filial (JAVA)</option>
+            <option value="nome" {% if tipo == 'nome' %}selected{% endif %}>Nome da Filial</option>
+            <option value="cnpj" {% if tipo == 'cnpj' %}selected{% endif %}>CNPJ</option>
+            <option value="cidade" {% if tipo == 'cidade' %}selected{% endif %}>Cidade</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <input type="text" name="q" class="form-control form-control-lg" 
+               placeholder="Digite o termo de busca..." 
+               value="{{ query }}">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">Buscar</button>
+        {% if query %}
+            <a href="{% url 'lista_lojas' %}" class="btn btn-outline-secondary btn-lg">Limpar</a>
+        {% endif %}
+    </div>
+</form>
     </div>
 </div>
 
