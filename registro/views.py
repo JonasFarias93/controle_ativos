@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db import transaction              
+from django.contrib import messages           
 from .forms import RegistroSaidaForm
 from .models import RegistroSaida, ItemBipado
 from projetos.models import Kit
 
 def iniciar_registro(request):
-    # Captura o ID do kit que vem da URL (enviado pelo seu JavaScript atualizarKit)
     kit_id = request.GET.get('kit')
     kit_selecionado = None
     if kit_id:
@@ -12,36 +13,40 @@ def iniciar_registro(request):
 
     if request.method == 'POST':
         form = RegistroSaidaForm(request.POST)
+        
+        # Coleta as listas do formulário
+        tipos = request.POST.getlist('tipo_equipamento[]')
+        ativos = request.POST.getlist('ativo[]')
+        series = request.POST.getlist('serie[]')
+
         if form.is_valid():
-            # 1. Salva o Registro Pai
-            registro_instancia = form.save(commit=False)
-            registro_instancia.tecnico = request.user
-            registro_instancia.save()
+            try:
+                with transaction.atomic(): # Início da proteção de dados
+                    # 1. Salva o Registro Pai
+                    registro_instancia = form.save(commit=False)
+                    registro_instancia.tecnico = request.user
+                    registro_instancia.save()
 
-            # 2. Pega as listas de bipes que o seu segundo HTML enviou
-            tipos = request.POST.getlist('tipo_equipamento[]')
-            ativos = request.POST.getlist('ativo[]')
-            series = request.POST.getlist('serie[]')
-
-            # 3. Salva os bipes no banco de dados
-            for t, a, s in zip(tipos, ativos, series):
-                if t: # Verifica se não está vazio
-                    ItemBipado.objects.create(
-                        registro=registro_instancia,
-                        equipamento_tipo=t,
-                        ativo_id=a,
-                        num_serie=s,
-                        codigo_java="GERADO" # Ou sua lógica de mapeamento
-                    )
-            
-            return redirect('home')
+                    # 2. Salva os bipes com validação de alinhamento
+                    for t, a, s in zip(tipos, ativos, series):
+                        if a.strip() and s.strip(): # Só cria se houver conteúdo real
+                            ItemBipado.objects.create(
+                                registro=registro_instancia,
+                                equipamento_tipo=t,
+                                ativo_id=a,
+                                num_serie=s,
+                                codigo_java="GERADO"
+                            )
+                    
+                    messages.success(request, "Movimentação registrada com sucesso!")
+                    return redirect('home')
+            except Exception as e:
+                messages.error(request, f"Erro ao processar registro: {e}")
     else:
         form = RegistroSaidaForm()
-        # Se veio um kit pela URL, já pré-seleciona ele no formulário
         if kit_id:
             form.fields['kit_utilizado'].initial = kit_id
 
-    # IMPORTANTE: Passamos o 'kit' para o template reconhecer e liberar a tabela de bipes
     return render(request, 'registro/form_registro.html', {
         'form': form, 
         'kit': kit_selecionado
