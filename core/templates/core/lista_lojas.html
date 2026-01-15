@@ -10,7 +10,7 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="GET" action="{% url 'lista_lojas' %}" class="row g-2">
+        <form method="GET" action="{% url 'core:lista_lojas' %}" class="row g-2">
     <div class="col-md-3">
         <select name="tipo" class="form-select form-select-lg">
             <option value="filial" {% if tipo == 'filial' %}selected{% endif %}>Filial (JAVA)</option>

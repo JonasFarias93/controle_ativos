@@ -14,15 +14,17 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">SISTEMA DE ATIVOS</a>
+            <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">SISTEMA DE ATIVOS</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}">Início</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'historico' %}active{% endif %}" 
+                        href="{% url 'core:historico' %}"><i class="bi bi-clock-history"></i> Histórico</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'controle_ativos:lista_ativos' %}">Ativos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_lojas' %}">Lojas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:lista_lojas' %}">Lojas</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'registro:iniciar_registro' %}">Novo Registro</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'projetos:cadastrar_kit' %}">Projetos</a></li>
                 </ul>
