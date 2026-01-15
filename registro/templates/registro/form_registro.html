@@ -15,7 +15,6 @@
                     {% for field in form %}
                         <div class="col-md-3 mb-3">
                             <label class="form-label fw-bold">{{ field.label }}</label>
-                            {# Adicionamos uma lógica para identificar o campo de kit #}
                             {% if field.name == 'kit_utilizado' %}
                                 <div id="kit-wrapper">
                                     {{ field }}
@@ -48,23 +47,35 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {# CORREÇÃO AQUI: Adicionado o { no início da linha abaixo #}
                             {% for item in kit.itens.all %}
-                                {# Loop para respeitar a quantidade definida no kit #}
                                 {% with ''|center:item.quantidade as range %}
-                                {% for _ in range %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ item.equipamento.nome }}</strong>
-                                        <input type="hidden" name="tipo_equipamento[]" value="{{ item.equipamento.nome }}">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="ativo[]" class="form-control form-control-sm input-bip" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="serie[]" class="form-control form-control-sm input-serie" required>
-                                    </td>
-                                </tr>
-                                {% endfor %}
+                                    {% for _ in range %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ item.equipamento.nome }}</strong>
+                                            <input type="hidden" name="tipo_equipamento[]" value="{{ item.equipamento.nome }}">
+                                        </td>
+                                        
+                                    {% if item.equipamento.exige_ativo %}
+                                        {# Item que PRECISA de patrimônio (Monitor, CPU, etc) #}
+                                        <td>
+                                            <input type="text" name="ativo[]" class="form-control form-control-sm input-bip" placeholder="Bipar Ativo..." required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="serie[]" class="form-control form-control-sm input-serie" placeholder="Bipar Serial..." required>
+                                        </td>
+                                        {% else %}
+                                        {# Item que NÃO tem patrimônio (Cabos, Teclados simples, etc) #}
+                                        <td>
+                                            <input type="text" name="ativo[]" class="form-control form-control-sm bg-light text-muted" value="N/A" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="serie[]" class="form-control form-control-sm bg-light text-muted" value="N/A" readonly>
+                                        </td>
+                                    {% endif %}
+                                    </tr>
+                                    {% endfor %}
                                 {% endwith %}
                             {% endfor %}
                         </tbody>

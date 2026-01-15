@@ -70,12 +70,11 @@
     </form>
 </div>
 
-<script>
-function atualizarKit() {
-    const kitId = document.getElementById('id_kit_utilizado').value;
-    const url = new URL(window.location);
-    url.searchParams.set('kit', kitId);
-    window.location.href = url.href; // Recarrega a página com o kit selecionado na URL
-}
-</script>
+{% extends 'base.html' %}
+{% load static %} {% block content %}
+   {% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/registro_bipagem.js' %}"></script>
+{% endblock %}
 {% endblock %}

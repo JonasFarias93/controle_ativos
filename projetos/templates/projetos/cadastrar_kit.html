@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -35,7 +36,6 @@
 <div class="row justify-content-center mb-5">
     <div class="col-md-10">
         <div class="card shadow">
-            
             <div class="card-header {% if editando %}bg-warning{% else %}bg-success{% endif %} text-white">
                 <h4 class="mb-0">
                     {% if editando %}
@@ -78,7 +78,8 @@
                         <tbody id="item-tbody">
                             {% for f in formset %}
                             <tr class="item-row">
-                                <td>{{ f.id }}{{ f.equipamento }}</td> <td>{{ f.uso_no_kit }}</td>
+                                <td>{{ f.id }}{{ f.equipamento }}</td> 
+                                <td>{{ f.uso_no_kit }}</td>
                                 <td>{{ f.quantidade }}</td>
                             </tr>
                             {% endfor %}
@@ -99,25 +100,15 @@
     </div>
 </div>
 
-<script>
-    document.getElementById('add-item').addEventListener('click', function() {
-        const tbody = document.getElementById('item-tbody');
-        const totalForms = document.querySelector('[id$="-TOTAL_FORMS"]'); 
-        const currentFormCount = parseInt(totalForms.value);
-        const rows = document.getElementsByClassName('item-row');
-        const newRow = rows[0].cloneNode(true);
-        const formRegex = new RegExp(`-(\\d+)-`, 'g');
-        newRow.innerHTML = newRow.innerHTML.replace(formRegex, `-${currentFormCount}-`);
-        
-        // Limpa campos na nova linha
-        newRow.querySelectorAll('input, select').forEach(input => {
-            if (input.type === 'hidden') return; // Não limpa campos ocultos de ID
-            if (input.type !== 'number') input.value = '';
-            else input.value = 1;
-        });
-        
-        tbody.appendChild(newRow);
-        totalForms.value = currentFormCount + 1;
-    });
+<script type="text/html" id="empty-form-template">
+    <tr class="item-row">
+        <td>{{ formset.empty_form.id }}{{ formset.empty_form.equipamento }}</td>
+        <td>{{ formset.empty_form.uso_no_kit }}</td>
+        <td>{{ formset.empty_form.quantidade }}</td>
+    </tr>
 </script>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/gestao_kits.js' %}"></script>
 {% endblock %}
